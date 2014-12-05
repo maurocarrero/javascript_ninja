@@ -1,0 +1,39 @@
+<html>
+<head>
+	<title>Sorting with a comparator</title>
+</head>
+<style type="text/css">
+	#results li.pass { color: green; }
+	#results li.fail { color: red; }
+</style>
+<body>
+	<section>
+		<h1>Sorting with a comparator</h1>
+		<ul id="results"></ul>
+	</section>	
+
+	<script type="text/javascript" src="test-suite.js"></script>
+	<script type="text/javascript">
+
+		var values = [233, 127, 4578, 12, 3, 7, 122, 9021];
+
+		values.sort();
+
+		console.info('Alphabetically: ', values);
+
+		function asc(x, y) {
+			return x - y;
+		}
+
+		function desc(x, y) {
+			return y - x;
+		}
+
+		console.info('Ascending:', values.sort(asc));
+		console.info('Descending:', values.sort(desc));
+
+		console.log('Which is the desc function name?', desc.name);
+
+	</script>
+</body>
+</html>

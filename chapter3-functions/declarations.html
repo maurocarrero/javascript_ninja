@@ -1,0 +1,107 @@
+<html>
+<head>
+	<title>Functions declarations</title>
+</head>
+<style type="text/css">
+	#results li.pass { color: green; }
+	#results li.fail { color: red; }
+</style>
+<body>
+	<section>
+		<h1>Function declarations</h1>
+		<ul id="results"></ul>
+	</section>	
+
+	<script type="text/javascript" src="test-suite.js"></script>
+	<script type="text/javascript">
+	
+		// function keyword - named function
+		function isNimble() {
+			return true;
+		}
+
+		assert(typeof window.isNimble === 'function', 'isNimble() defined');
+		assert(window.isNimble.name === 'isNimble', 'isNimble has a name: ' + window.isNimble.name);
+
+		// Anonymous function
+		var canFly = function () {
+			return true;
+		};
+
+		assert(typeof window.canFly === 'function', 'canFly() defined');
+		assert(window.canFly.name === '', 'canFly() has no name');
+
+		window.isDeadly = function () { 
+			return true;
+		};
+
+		assert(typeof window.isDeadly === 'function', 'isDeadly() defined');
+		assert(window.isDeadly.name === '', 'isDeadly() has no name');
+
+		// Anonymous function with a name
+		var hipotetically = function hipoteticallyName() {
+			return true;
+		};
+
+		assert(typeof window.hipotetically === 'function', 'hipotetically() defined');
+		assert(typeof window.hipoteticallyName !== 'function', 'hipoteticallyName is not defined');
+		assert(window.hipotetically.name === 'hipoteticallyName', 'hipotetically() has this name: ' + window.hipotetically.name);
+
+		// Inner function
+		function outer() {
+			assert(typeof inner === 'function', 'inner in scope before declaration');
+			
+			function inner() {
+
+				function innerInner() {}
+
+				assert(typeof innerInner === 'function', 'innerInner in inner');
+			}
+			
+			try {
+				if (!innerInner) {
+					assert(innerInner, 'innerInner in outer scope');
+				}				
+			} catch (e) {
+				assert(true, 'innerInner not in outer scope')
+			}			
+			assert(typeof inner === 'function', 'inner in scope after declaration');
+			assert(window.inner === undefined, 'inner not in global scope');
+		}
+
+		outer();
+		assert(window.inner === undefined, 'inner still not in global scope');
+
+		window.wieldSword = function swingSword() { return true; };
+		assert(window.wieldSword.name === 'swingSword', 'wieldSword\'s real name is ' + window.wieldSword.name);
+
+		var noNamed = function () { return true; };
+
+		function noNamed() {
+			return false;
+		}
+
+		assert(noNamed(), 'noNamed is the function assigned to noNamed variable');
+
+		noNamed = function named() { return true; };
+
+		function named() {
+			return false;
+		}
+
+		assert(!named(), 'named is \'named\' function');
+
+		// Within immediate function
+		(function () {
+			function soundsGood() {
+				return true;
+			}
+
+			assert(typeof window.soundsGood === 'undefined', 'soundsGood() not defined in the global scope from within the closure off an immediate function');
+			assert(typeof soundsGood === 'function', 'soundsGood() defined in the immediate function scope');
+			assert(soundsGood.name === 'soundsGood', 'soundsGood has a name: ' + soundsGood.name);
+		}());
+
+	</script>
+</body>
+</html>

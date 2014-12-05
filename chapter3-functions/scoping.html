@@ -1,0 +1,221 @@
+<html>
+<head>
+	<title>Scoping and Functions</title>
+</head>
+<style type="text/css">
+	#results li.pass { color: green; }
+	#results li.fail { 
+		color: red;
+	}
+	#results li.fail li.fail { 
+		text-decoration: line-through; 
+	}
+</style>
+<body>
+	<section>
+		<h1>Scoping and Functions</h1>
+		<ul id="results"></ul>
+	</section>	
+
+	<script type="text/javascript" src="test-suite.js"></script>
+	<script type="text/javascript">
+		
+		(function () {
+
+			test('No block scope', function () {
+				if (window) {
+					var a = 77;
+				}
+				assert(a === 77, 'javascript has not block scope.');	
+
+				if (window) {
+					var a = 77;
+					for (var i = 0; i <= 1; i += 1) {
+						var a = 121 + i;
+					}
+				}
+				assert(a === 122, 'a is last modified in the for.');
+
+			});
+
+			test('Hoisting', function () {
+				var value = 77;
+				function here() {
+					assert(value === undefined, '\'value\' variable is not the outer one, and is declared' + 
+						' from the beginning of the here function as undefined until assigned within the blocks.');
+					if (window) {
+						for (var i = 0; i <= 1; i += 1) {
+							if (i === 1) {
+								var value = true;
+							}
+						}
+					}
+					assert(value === true, 'value is indeed, true; javascript has function scope.');
+				}
+				assert(value === 77, 'outer value remains as 77');
+				here();
+			});
+
+			
+
+
+			/**
+			 *  Here is reached from within immediate functions
+			 **/
+			 test('Function scope', function () {
+				function toy () {};
+
+				function play() {
+					var p = true;
+
+					assert(typeof toy === 'function', 'function \'toy\' is reached in play function');
+					assert(p, 'p is the only variable reached from within play function');
+
+					try {
+						ip = 1;	
+					} catch (e) {
+						assert(true, 'ip variable from within innerPlay function is not reached from play function');
+					}
+					try {
+						iip = 1;	
+					} catch (e) {
+						assert(true, 'iip variable from within innerInnerPlay function is not reached from play function');
+					}
+					
+
+
+					function innerPlay() {
+						var ip = true;
+
+						assert(typeof toy === 'function', 'function \'toy\' is reached in innerPlay function');
+						assert(ip && p, 'p and ip are reachd from within innerPlay function');
+
+						try {
+							iip = 1;	
+						} catch (e) {
+							assert(true, 'iip variable from within innerInnerPlay function is not reached from innerPlay function');
+						}
+
+						function innerInnerPlay() {
+							var iip = true;
+
+							assert(typeof toy === 'function', 'function \'toy\' is reached in innerInnerPlay function');
+							assert(ip && iip && p, 'p, ip and iip are reachd from within innerInnerPlay function');
+						};
+
+						innerInnerPlay();
+					};
+
+					innerPlay();
+
+				};
+
+				play();
+
+			 });
+			
+
+
+			/**
+			 *  Here is reached from within immediate functions
+			 **/
+			 test('Immediate functions', function () {
+
+			 	function where() {}
+
+				(function () {
+
+					assert(typeof where === 'function', 'function \'where\' is reached from the inner immediate function');
+
+					(function () {
+						assert(typeof where === 'function', 'function \'where\' is reached from within the inner inner immediate function');
+
+						(function () {
+							assert(typeof where === 'function', 'function \'where\' is reached from within the inner inner inner immediate function');
+						}());
+
+					}());
+
+				}());
+ 	
+			 });
+
+			 test('Outer and inner functions again', function () {
+
+			 	test('Before outer', function () {
+			 		assert(typeof outer === 'function', 'outer() is in scope');
+					assert(typeof inner === 'function', 'inner() is in scope');
+					assert(typeof a === 'number', 'a is in scope');
+					assert(typeof b === 'number', 'b is in scope');
+					assert(typeof c === 'number', 'c is in scope');	
+			 	});				
+
+				function outer() {
+
+					test('Inside outer before a', function () {
+				 		assert(typeof outer === 'function', 'outer() is in scope');
+						assert(typeof inner === 'function', 'inner() is in scope');
+						assert(typeof a === 'number', 'a is in scope');
+						assert(typeof b === 'number', 'b is in scope');
+						assert(typeof c === 'number', 'c is in scope');	
+				 	});
+
+					var a = 1;
+
+					test('Inside outer after a', function () {
+				 		assert(typeof outer === 'function', 'outer() is in scope');
+						assert(typeof inner === 'function', 'inner() is in scope');
+						assert(typeof a === 'number', 'a is in scope');
+						assert(typeof b === 'number', 'b is in scope');
+						assert(typeof c === 'number', 'c is in scope');	
+				 	});
+
+					function inner() {}
+
+					var b = 2;
+
+
+					test('Inside outer after inner and b', function () {
+				 		assert(typeof outer === 'function', 'outer() is in scope');
+						assert(typeof inner === 'function', 'inner() is in scope');
+						assert(typeof a === 'number', 'a is in scope');
+						assert(typeof b === 'number', 'b is in scope');
+						assert(typeof c === 'number', 'c is in scope');	
+				 	});
+
+					if (a === 1) {
+						var c = 3;
+						test('Inside outer after c inside if', function () {
+					 		assert(typeof outer === 'function', 'outer() is in scope');
+							assert(typeof inner === 'function', 'inner() is in scope');
+							assert(typeof a === 'number', 'a is in scope');
+							assert(typeof b === 'number', 'b is in scope');
+							assert(typeof c === 'number', 'c is in scope');	
+					 	});
+					}
+
+					test('Inside outer after c outside if', function () {
+				 		assert(typeof outer === 'function', 'outer() is in scope');
+						assert(typeof inner === 'function', 'inner() is in scope');
+						assert(typeof a === 'number', 'a is in scope');
+						assert(typeof b === 'number', 'b is in scope');
+						assert(typeof c === 'number', 'c is in scope');	
+				 	});			
+				}
+
+				outer();
+
+				test('After outer is executed', function () {
+			 		assert(typeof outer === 'function', 'outer() is in scope');
+					assert(typeof inner === 'function', 'inner() is in scope');
+					assert(typeof a === 'number', 'a is in scope');
+					assert(typeof b === 'number', 'b is in scope');
+					assert(typeof c === 'number', 'c is in scope');	
+			 	});
+
+			 });
+			
+		}());
+	</script>
+</body>
+</html>

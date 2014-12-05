@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Wielding functions</title>
+
+  <link rel="shortcut icon" type="image/png" href="jasmine/lib/jasmine-2.1.2/jasmine_favicon.png">
+  <link rel="stylesheet" href="jasmine/lib/jasmine-2.1.2/jasmine.css">
+</head>
+
+<body>
+
+
+  <script src="jasmine/lib/jasmine-2.1.2/jasmine.js"></script>
+  <script src="jasmine/lib/jasmine-2.1.2/jasmine-html.js"></script>
+  <script src="jasmine/lib/jasmine-2.1.2/boot.js"></script>
+  <script type="text/javascript">
+
+    var timerCallback;
+
+    beforeEach(function() {
+      timerCallback = jasmine.createSpy("timerCallback");
+      jasmine.clock().install();
+    });
+  
+    afterEach(function() {
+      jasmine.clock().uninstall();
+    });
+
+    describe("Anonymous functions", function() {
+      
+      it("The Anonymous function is set as a handler for the onload event", function() {
+        window.onload = function callback() {};
+        expect(window.onload.name).toBe('callback');
+      });
+
+      it("The ninja is shouting", function() {
+        var ninja = {
+          shout: function () {
+            return 'I am shouting';
+          }
+        };
+        expect(ninja.shout()).toBe('I am shouting');
+        expect(ninja.shout.name).toBe('');
+      });
+
+      it("An anonymous function as a callback to setTimeout", function() {
+
+        setTimeout(function () {
+          timerCallback();
+        }, 500);
+
+        jasmine.clock().tick(490);
+
+        expect(timerCallback).not.toHaveBeenCalled();
+
+        jasmine.clock().tick(11);
+
+        expect(timerCallback).toHaveBeenCalled();
+      });
+
+    });
+
+  </script>
+
+</body>
+</html>

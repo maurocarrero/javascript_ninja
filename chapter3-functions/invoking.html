@@ -1,0 +1,199 @@
+<html>
+<head>
+	<title>Invoking functions</title>
+</head>
+<style type="text/css">
+	#results li.pass { color: green; }
+	#results li.fail { 
+		color: red;
+	}
+	#results li.fail li.fail { 
+		text-decoration: line-through; 
+	}
+</style>
+<body>
+	<section>
+		<h1>Invoking functions</h1>
+		<h2>4 different ways to invoke a function</h2>
+		<ul id="results"></ul>
+	</section>	
+
+	<script type="text/javascript" src="test-suite.js"></script>
+	<script type="text/javascript">
+		
+		(function () {
+
+			test('Function arguments', function () {
+
+				function fn(a, b, c) {
+					assert(typeof a === 'number', 'a is ' + a);
+					assert(typeof b === 'number', 'b is ' + b);
+					assert(typeof c === 'number', 'c is ' + c);
+
+					return arguments.length;
+				}
+
+				assert(fn(1, 2, 3, 4, 5) === 5, 'There are 5 arguments on arguments attribute');
+				assert(fn(1, 2) === 2, 'There are 2 arguments on arguments attribute');
+
+			});
+
+			function creep() { return this; }
+
+			test('As a function', function () {
+
+				assert(creep() === window, 'Creeping in the window');
+
+				var sneak = creep;
+
+				assert(sneak() === window, 'Sneaking in the window');
+
+				(function () {
+
+					assert(this === window, 'this is window');
+
+					function outer() {
+
+						assert(this === window, 'this is window');
+
+						function inner() {
+
+							assert(this === window, 'this is window');
+
+							function innerInner() {
+								assert(this === window, 'this is window');
+							}
+
+							innerInner();
+						}
+
+						inner();
+					}
+
+					outer();
+
+				}());
+
+
+			});
+
+			test('As a method', function () {
+
+				var ninja1 = {
+					skulk: creep
+				};
+
+				assert(ninja1.skulk() === ninja1, 'The 1st ninja is skulking');
+
+				var ninja2 = {
+					skulk: creep
+				};
+
+				assert(ninja2.skulk() === ninja2, 'The 2nd ninja is skulking');
+			});
+
+			test('As a constructor', function () {
+
+				function Ninja() {
+					this.skulk = function () {
+						return this;
+					};
+				}
+
+				var ninja1 = new Ninja(),
+					ninja2 = new Ninja();
+
+				assert(ninja1.skulk() === ninja1, 'The 1st ninja is skulking');
+				assert(ninja2.skulk() === ninja2, 'The 2nd ninja is skulking');
+
+			});
+
+			test('As applied or called', function () {
+
+				function juggle() {
+					var result = 0;
+					for (var n = 0; n < arguments.length; n += 1) {
+						result += arguments[n];
+					}
+					this.result = result;
+				}
+
+				var ninja1 = {};
+				var ninja2 = {};
+
+				juggle.apply(ninja1, [1, 2, 3, 4]);
+				juggle.call(ninja2, 5, 6, 7, 8);
+
+				assert(ninja1.result === 10, 'juggled via apply');
+				assert(ninja2.result === 26, 'juggled via call');
+
+				function poorForEach(collection, callback) {
+					var i;
+
+					for (i = 0; i < collection.length; i += 1) {
+						callback.call(collection[i], i);
+					}
+				}
+
+				var weapons = ['shuriken', 'katana', 'nunchuks'];
+
+				poorForEach(weapons, function (index) {
+					assert(String(this) === weapons[index], 'Got the expected value of ' + weapons[index]);
+				});
+
+				function forEach(collection, callback) {
+					var i,
+						toString = Object.prototype.toString,
+						slice = Array.prototype.slice;
+
+					try {
+
+						if (!collection || toString.call(collection) !== '[object Array]') {
+							throw new Error('The 1st param must be an array');
+						}
+						if (!callback || typeof callback !== 'function') {
+							throw new Error('The 2nd param must be a function');	
+						}
+
+						var args = slice.call(arguments, 2);
+						for (i = 0; i < collection.length; i += 1) {
+							callback.call(collection[i], i, args);
+						}
+
+					} catch(e) {
+						assert(true, e.message);
+					}					
+				}
+
+				var weapons = ['shuriken', 'katana', 'nunchuks'];
+
+				forEach(weapons, function (index) {
+					assert(String(this) === weapons[index], 'Got the expected value of ' + weapons[index]);
+				});
+
+				var notAnArray = {},
+					notAFunction = weapons;
+
+				forEach(notAnArray, function () {});
+
+				forEach(undefined, function () {});
+
+				forEach(null, function () {});
+
+				forEach(weapons, notAFunction);
+
+				forEach(weapons);
+
+				forEach(weapons, undefined);
+
+				forEach(weapons, null);
+
+
+			});
+
+
+		}());
+
+	</script>
+</body>
+</html>

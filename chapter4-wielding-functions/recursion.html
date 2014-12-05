@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Wielding functions</title>
+
+  <link rel="shortcut icon" type="image/png" href="jasmine/lib/jasmine-2.1.2/jasmine_favicon.png">
+  <link rel="stylesheet" href="jasmine/lib/jasmine-2.1.2/jasmine.css">
+</head>
+
+<body>
+
+  <h1>Recursion</h1>
+
+  <script src="jasmine/lib/jasmine-2.1.2/jasmine.js"></script>
+  <script src="jasmine/lib/jasmine-2.1.2/jasmine-html.js"></script>
+  <script src="jasmine/lib/jasmine-2.1.2/boot.js"></script>
+  <script type="text/javascript">
+
+      function isPalindromeIterative(word) {
+
+        var wordLength = word.length,
+          is = true;
+
+        for (var i = 0, j = wordLength - 1; i <= j; i += 1, j -= 1) {
+
+          var firstChar = word.charAt(i),
+            secondChar = word.charAt(j);
+
+          if (firstChar !== secondChar) {
+            is = false;
+            break;
+          }
+
+        }
+
+        return is;
+      }
+
+      function isPalindromeRecursive(word) {
+
+        if (!word || word === null) {
+          return false;
+        }
+
+        return (function innerIs(word) {
+
+          var firstChar,
+            lastChar,
+            wordLength = word.length;
+
+          if (wordLength <= 1) {
+            return true;
+          }
+
+          firstChar = word.charAt(0);
+          lastChar = word.charAt(wordLength-1);
+
+          if (firstChar === lastChar) {
+            return innerIs(word.substring(1, wordLength-2));
+          }
+
+          return false;
+
+        }(word));
+      }
+
+    describe('Non recursive suite', function () {
+
+      it('magma is not a palindrome', function () {
+        expect(isPalindromeIterative('magma')).toBe(false);
+      });
+
+      it('neither is boa', function () {
+        expect(isPalindromeIterative('boa')).toBe(false);
+      });
+
+      it('oso is a palindrome', function () {
+        expect(isPalindromeIterative('oso')).toBe(true);
+      });
+
+      it('oso is a palindrome', function () {
+        expect(isPalindromeIterative('oso')).toBe(true);
+      });
+
+      it('oo is a palindrome', function () {
+        expect(isPalindromeIterative('oo')).toBe(true);
+      });
+
+      it('y is a palindrome', function () {
+        expect(isPalindromeIterative('y')).toBe(true);
+      });
+    });
+
+    describe('Recursive suite', function () {
+
+      it('magma is not a palindrome', function () {
+        expect(isPalindromeRecursive('magma')).toBe(false);
+      });
+
+      it('neither is boa', function () {
+        expect(isPalindromeRecursive('boa')).toBe(false);
+      });
+
+      it('oso is a palindrome', function () {
+        expect(isPalindromeRecursive('oso')).toBe(true);
+      });
+
+      it('oso is a palindrome', function () {
+        expect(isPalindromeRecursive('oso')).toBe(true);
+      });
+
+      it('oo is a palindrome', function () {
+        expect(isPalindromeRecursive('oo')).toBe(true);
+      });
+
+      it('y is a palindrome', function () {
+        expect(isPalindromeRecursive('y')).toBe(true);
+      });
+
+      it('The empty string is not a palindrome', function () {
+        expect(isPalindromeRecursive('')).toBe(false);
+      });
+
+      it('null is not a palindrome', function () {
+        expect(isPalindromeRecursive(null)).toBe(false);
+      });
+
+      it('undefined is not a palindrome', function () {
+        expect(isPalindromeRecursive(undefined)).toBe(false);
+      });
+    });
+
+    describe('Recursion with named function', function () {
+
+      // Chirp function
+      function chirp(n) {
+        return n > 1 ? chirp(n - 1) + '-chirp' : 'chirp';
+      }
+
+      it('Calling the named function comes naturally, there are 3 chirps', function () {
+        expect(chirp(3)).toBe('chirp-chirp-chirp');
+      });
+
+    });
+
+    describe('Recursion with methods', function () {
+
+      var ninja1, ninja2, ninja3,
+        samurai1, samurai2, samurai3;
+
+      beforeEach(function () {
+        // Method called recursively
+        ninja1 = {
+          chirp: function (n) {
+            return n > 1 ? ninja1.chirp(n - 1) + '-chirp' : 'chirp';
+          },
+        };
+      });
+
+      
+      it('Calling the method recursively is not too confusing either.', function () {
+        expect(ninja1.chirp(3)).toBe('chirp-chirp-chirp');
+      });
+
+
+      it('ninja1 is reassigned with the value {}', function () {
+        
+        samurai1 = {
+          chirp: ninja1.chirp
+        };
+
+        expect(ninja1.chirp(1)).toBe('chirp');
+        
+        ninja1 = {};
+        
+        expect(ninja1.hasOwnProperty('chirp')).toBe(false);
+
+      }); 
+
+
+      it('ninja1.chirp not exists anymore and throws an error', function () {
+        try {
+          ninja1 = {};
+          samurai1.chirp(5);
+        } catch (e) {
+          expect(e.message).toBe('undefined is not a function');
+        }
+      });
+
+
+      it('The recursive method is called with its inner name', function () {
+        ninja2 = {
+          chirp: function innerChirp(n) {
+            return n > 1 ? innerChirp(n - 1) + '-chirp' : 'chirp';
+          },
+        };
+
+        expect(ninja2.chirp(5)).toBe('chirp-chirp-chirp-chirp-chirp');
+      });
+
+
+      it('ninja2.chirp not exists anymore but its innerChirp function still works', function () {
+
+        samurai2 = {
+          chirp: ninja2.chirp
+        };
+        
+        // Changes ninja2
+        ninja2 = {};
+
+        expect(ninja2.hasOwnProperty('chirp')).toBe(false);
+        expect(samurai2.hasOwnProperty('chirp')).toBe(true);
+        expect(samurai2.chirp(2)).toBe('chirp-chirp');
+
+        ninja2.chirp = true;
+        
+        expect(ninja2.hasOwnProperty('chirp')).toBe(true);
+        expect(samurai2.chirp(2)).toBe('chirp-chirp');
+
+      });
+
+
+      it('This time samurai3 is linked to the outerChirp function through ninja3.chirp', function () {
+        var outerChirp = function (n) {
+            return n > 1 ? outerChirp(n - 1) + '-chirp' : 'chirp';
+          };
+
+          ninja3 = {
+            chirp: outerChirp,
+          };
+          
+          samurai3 = {
+            chirp: ninja3.chirp
+          };
+
+        ninja3 = {};
+
+        expect(samurai3.chirp(2)).toBe('chirp-chirp');
+      });
+
+    });
+
+    describe('Referencing the recursive method with the function context (this)', function () {
+      var ninja1 = {
+          chirp: function (n) {
+            return n > 1 ? this.chirp(n - 1) + '-chirp' : 'chirp';
+          },
+        };
+      
+      it('Calling the method recursively is not too confusing either.', function () {
+
+        var samurai1 = {
+          chirp: ninja1.chirp
+        };
+
+        ninja1 = {};
+
+        expect(samurai1.chirp(3)).toBe('chirp-chirp-chirp');
+
+      });
+    });
+
+    describe('Inline named functions', function () {
+
+      var ninja1 = {
+          chirp: function (n) {
+            return n > 1 ? this.chirp(n - 1) + '-chirp' : 'chirp';
+          },
+        };
+      
+      it('If we change the samurai method\'s name everything breaks.', function () {
+
+        var samurai1 = {
+          chop: ninja1.chirp
+        };
+
+        ninja1 = {};
+
+        try {
+          samurai1.chop(5);
+        } catch (e) {
+          expect(e.message).toBe('undefined is not a function');
+        }
+
+      });
+      
+      it('If we call recursively the samurai method with its inner name everything\'s ok.', function () {
+
+        var ninja1 = {
+          chirp: function chirping(n) {
+            return n > 1 ? chirping(n - 1) + '-chirp' : 'chirp';
+          },
+        };
+
+        var samurai1 = {
+          chop: ninja1.chirp
+        };
+
+        ninja1 = {};
+
+        expect(samurai1.chop(5)).toBe('chirp-chirp-chirp-chirp-chirp');
+
+      });
+
+      it('ninja is myNinja', function () {
+
+        var ninja = function myNinja() {
+          expect(ninja === myNinja).toBe(true);  
+        };
+
+        ninja();
+      });
+
+      it('but myNinja is not defined outside the function', function () {
+
+        var ninja = function myNinja() {};
+
+        ninja();
+
+        try {
+          myNinja();  
+        } catch (e) {
+          expect(e.message).toBe('myNinja is not defined');  
+        }
+
+      });
+
+    });
+
+  </script>
+
+</body>
+</html>
