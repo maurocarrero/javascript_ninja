@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Wielding functions</title>
+  <link rel="stylesheet" href="bower_components/jasmine/lib/jasmine-core/jasmine.css">
+</head>
+
+<body>
+
+  <h1>Functions as objects</h1>
+
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/boot.js"></script>
+  <script type="text/javascript">
+
+      
+    describe('Function as objects suite', function () {
+
+      it('Both exists', function () {
+
+        var obj = {},
+          fn = function () {};
+
+        expect(obj && fn && true).toBe(true);
+
+      });
+
+    });
+
+    describe('Storing a collection of unique functions', function () {
+
+      var store = {
+        
+        nextId: 1,
+
+        cache: {},
+
+        add: function (fn) {
+          if (!fn.id) {
+            fn.id = store.nextId++;
+            return !!(store.cache[fn.id] = fn);
+          }
+        }
+      };
+
+      function ninja() {}
+
+      it('Function was safely added', function () {
+        expect(store.add(ninja)).toBe(true);
+      });
+
+      it('But it was only added once', function () {
+        store.add(ninja);
+        expect(!store.add(ninja)).toBe(true);
+      });
+
+      it('Tests the !! operator', function () {
+        var a;
+        expect(a = 1).toBe(1);
+        expect(!(a = 1)).toBe(false);
+        expect(!!(a = 1)).toBe(true);
+      });
+
+
+    });
+
+  </script>
+
+</body>
+</html>
