@@ -15,11 +15,29 @@
   <script src="bower_components/jasmine/lib/jasmine-core/boot.js"></script>
   <script type="text/javascript">
 
-    describe('Array like methods', function () {
+    describe('Using apply() to supply variable arguments', function () {
 
+      // Math context is not strictly necessary, it is there for being tidy.
+
+      function smallest(array) {
+        return Math.min.apply(Math, array);
+      }
+
+      function largest(array) {
+        return Math.max.apply(Math, array);
+      }
       
+      it('Located the smallest value', function () {
+        expect(smallest([0, 1, 2, 3])).toBe(0);
+      });
 
-    });  
+      it('Located the largest value', function () {
+        expect(largest([0, 1, 2, 3, 4, 5, 6, 7])).toBe(7);
+      });
+
+
+    });
+
 
 
   </script>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Wielding functions</title>
+  <link rel="stylesheet" href="bower_components/jasmine/lib/jasmine-core/jasmine.css">
+</head>
+
+<body>
+
+  <h1>Variable-length argument lists</h1>
+  
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/boot.js"></script>
+  <script type="text/javascript">
+
+    describe('Function overloading', function () {
+
+      function merge(root) {
+        for (var i = 1; i < arguments.length; i += 1) {
+          for (var key in arguments[i]) {
+            if (arguments[i].hasOwnProperty(key)) {
+              root[key] = arguments[i][key];  
+            }            
+          }
+        }
+        return root;
+      }
+
+      it('Merge both objects', function () {
+
+        var merged = merge({ name: 'Batou'}, { city: 'Niihama' });
+
+        expect(merged.name).toBe('Batou');
+
+        expect(merged.city).toBe('Niihama');
+
+      })
+
+    });
+
+    describe('Slicing and dicing an arguments list', function () {
+
+      function myMultiMax(multi) {
+        var first, max,
+          args = arguments,
+          slice = Array.prototype.slice;
+
+        if (args.length >= 2) {
+          first = args[0];
+          args = slice.call(args, 1);
+          max = Math.max.apply(Math, args);
+          return first * max;
+        }
+        if (args.length === 1) {
+          return args[0];
+        }
+      }
+
+      function multiMax(multi) {
+        return multi * Math.max.apply(Math, Array.prototype.slice.call(arguments, 1));
+      }
+
+      it('Checks whether myMultiMax does its work', function () {
+        expect(myMultiMax(7, 1, 2, 3)).toBe(21);
+      });
+
+      it('Confirms myMultiMax with a longer list of arguments', function () {
+        expect(myMultiMax(2, 1, 2, 3, 750, 6, 5, 4, 42, 0, -109, 9)).toBe(1500);  
+      });
+
+      it('Checks myMultiMax with one argument', function () {
+        expect(myMultiMax(7)).toBe(7);
+      });
+
+      it('Checks myMultiMax with two arguments', function () {
+        expect(myMultiMax(7, 2)).toBe(14);
+      });
+
+      it('Checks myMultiMax with no arguments', function () {
+        expect(myMultiMax()).toBe(undefined);
+      });
+
+      it('Checks whether multiMax does its work', function () {
+        expect(multiMax(7, 1, 2, 3)).toBe(21);
+      });
+
+      it('Confirms multiMax with a longer list of arguments', function () {
+        expect(multiMax(2, 1, 2, 3, 750, 6, 5, 4, 42, 0, -109, 9)).toBe(1500);  
+      });
+
+      it('FAILS multiMax with one argument', function () {
+        expect(multiMax(7)).toBe(7);
+      });
+
+      it('Checks multiMax with two arguments', function () {
+        expect(multiMax(7, 2)).toBe(14);
+      });
+
+      it('FAILS multiMax with no arguments', function () {
+        expect(multiMax()).toBe(undefined);
+      });
+    });
+
+    describe('Overloading with the length property', function () {
+      
+      function noNinja() {}
+      function makeNinja(name) {}
+      function makeSamurai(name, rank) {}
+
+      it('noNinja function should have a length of 0', function () {
+        expect(noNinja.length).toBe(0);
+      });
+      it('makeNinja function should have a length of 0', function () {
+        expect(makeNinja.length).toBe(1);
+      });
+      it('makeSamurai function should have a length of 2', function () {
+        expect(makeSamurai.length).toBe(2);  
+      });
+    });
+
+    describe('Overloading functions by argument count', function () {
+
+      function addMethod(obj, name, fn) {
+        if (arguments.length < 3) {
+          return;
+        }
+        // UNFINISHED
+      }
+
+      it();
+    });
+
+  </script>
+
+</body>
+</html>
