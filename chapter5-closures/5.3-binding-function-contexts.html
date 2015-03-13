@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Closures</title>
+  <link rel="stylesheet" href="bower_components/jasmine/lib/jasmine-core/jasmine.css">
+</head>
+
+<body>
+
+  <h1>Binding function contexts</h1>
+  <div>
+    <p>call() and apply() methods could be used to manipulate the context of a function.</p>
+    <p>This can be potentially harmful to object-oriented code</p>
+    <div>
+      This button has the button itself, the target of the listener as the -this- element
+      <button id="test">Click Me!</button>
+    </div>
+    <div>
+      This other button has the button object set as its context -this-
+      <button id="test2">Click Me again!</button>
+    </div>
+  </div>  
+
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/boot.js"></script>
+  <script type="text/javascript">
+    var button = {
+      clicked: false,
+      click: function () {
+        this.clicked = true;
+        console.log('-this- was clicked?', this);
+      }
+    };
+
+    var elem = document.getElementById('test'),
+      elem2 = document.getElementById('test2');
+
+    elem.addEventListener('click', button.click, false);
+
+    function bind(context, name) {
+      return function () {
+        return context[name].apply(context, arguments);
+      };
+    }
+
+    elem2.addEventListener('click', bind(button, 'click'), false);
+
+  </script>
+
+</body>
+</html>

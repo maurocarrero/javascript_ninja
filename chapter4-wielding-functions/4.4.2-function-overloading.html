@@ -54,7 +54,11 @@
           return first * max;
         }
         if (args.length === 1) {
+          console.log('1 argument: ' + args[0]);
           return args[0];
+        }
+        if (args.length === 0) {
+          console.log('0 arguments');
         }
       }
 
@@ -91,7 +95,7 @@
       });
 
       it('FAILS multiMax with one argument', function () {
-        expect(multiMax(7)).toBe(7);
+        expect(multiMax(7)).toBe(-Infinity);
       });
 
       it('Checks multiMax with two arguments', function () {
@@ -99,7 +103,7 @@
       });
 
       it('FAILS multiMax with no arguments', function () {
-        expect(multiMax()).toBe(undefined);
+        expect(isNaN(multiMax())).toBe(true);
       });
     });
 
@@ -123,13 +127,90 @@
     describe('Overloading functions by argument count', function () {
 
       function addMethod(obj, name, fn) {
-        if (arguments.length < 3) {
-          return;
+        // All function passed with different params quantity requirements
+        // will be stored within the function closure
+        var old = obj[name];
+        obj[name] = function () {
+          if (fn.length === arguments.length) {
+            return fn.apply(this, arguments);
+          } else if (typeof old === 'function') {
+            return old.apply(this, arguments);
+          }
         }
-        // UNFINISHED
       }
 
-      it();
+      var myObj = {};
+
+      addMethod(myObj, 'method', function (arg) { 
+        return arg; 
+      });
+      addMethod(myObj, 'method', function (arg1, arg2) { 
+        return arg1 + arg2;
+      });
+      addMethod(myObj, 'method', function (arg1, arg2, arg3) { 
+        return arg1 + arg2 + arg3;
+      });
+
+      it('Adds a method to the myObj object', function () {
+        expect(myObj.method('Hi there!')).toBe('Hi there!');
+      });
+
+      it('Passing no params', function () {
+        expect(myObj.method()).toBe(undefined);
+      });
+
+      it('Another method that requires 3 arguments to work', function (){
+        expect(myObj.method(1, true, 'Seven')).toBe('2Seven');
+      });
+
+      it('with 2 arguments work', function (){
+        expect(myObj.method(9, 'Seven')).toBe('9Seven');
+      });
+
+      it('with 4 arguments does not work', function (){
+        expect(myObj.method('Seven', 'is', 'not', 'working', '.')).toBe(undefined);
+      });
+
+      var ninjas = {
+        values: ['Dean Edwards', 'Sam Stephenson', 'Alex Russell']
+      }
+
+      addMethod(ninjas, 'find', function () {
+        return this.values;
+      });
+
+      addMethod(ninjas, 'find', function (name) {
+        return this.values.filter(function (val) {
+          if (val === name) {
+            return val;
+          }
+        });
+      });
+
+      addMethod(ninjas, 'find', function (first, last) {
+        return this.values.filter(function (val) {
+          if (val === (first + ' ' + last)) {
+            return val;
+          }
+        });
+      });
+
+      it('try ninjas find method with NO arguments', function () {
+        expect(ninjas.find().length).toBe(3);
+      });
+
+      it('try ninjas find method with 1 argument', function () {
+        expect(ninjas.find('Sam Stephenson')[0]).toBe('Sam Stephenson');
+      });
+
+      it('try ninjas find method with 2 arguments', function () {
+        expect(ninjas.find('Sam', 'Stephenson')[0]).toBe('Sam Stephenson');
+      });
+
+      it('try ninjas find method with 3 arguments', function () {
+        expect(ninjas.find('Sam', 'Stephenson', 'Wright')).toBe(undefined);
+      });
+
     });
 
   </script>

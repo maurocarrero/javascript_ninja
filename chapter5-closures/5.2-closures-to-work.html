@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Closures</title>
+  <link rel="stylesheet" href="bower_components/jasmine/lib/jasmine-core/jasmine.css">
+</head>
+
+<body>
+
+  <h1>Closures to work</h1>
+  
+  <div class="alert" id="test-subject"></div>
+
+  <button id="test-button" class="btn">Bring data</button>
+
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/boot.js"></script>
+  <script type="text/javascript">
+
+    describe('Private variables', function () {
+
+      it('Hides feints variable from external direct access', function () {
+
+        function Ninja() {
+          var feints = 0;
+
+          this.getFeints = function () {
+            return feints;
+          };
+
+          this.feint = function () {
+            feints += 1;
+            return this;
+          };
+        }
+
+        var ninja = new Ninja();
+
+        expect(ninja.getFeints()).toBe(0);
+
+        ninja.feint().feint();
+
+        expect(ninja.getFeints()).toBe(2);
+
+      });
+
+      it('', function () {
+        expect().toBe();
+      });
+
+    });
+
+    
+    $('#test-button').click(function () {
+      var elem$ = $('#test-subject');
+
+      elem$.html('Loading...');
+      $('#test-button').hide();
+
+      $.ajax({
+        url: 'test.html',
+        success: function (html) {
+          setTimeout(function () {
+            elem$.html(html);
+          }, 2000);
+        }
+      });
+    });
+
+  </script>
+
+</body>
+</html>
