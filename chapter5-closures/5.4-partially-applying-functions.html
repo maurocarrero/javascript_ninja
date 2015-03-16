@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Closures</title>
+  <link rel="stylesheet" href="bower_components/jasmine/lib/jasmine-core/jasmine.css">
+</head>
+
+<body>
+
+  <h1>Partially applying functions</h1>
+  <h2>or Currying</h2>
+  <div>
+    <p>Prefill arguments to a function before it's even executed</p>
+    <p>Sort of proxy function</p>
+    <p>Using a CLOSURE to remember state</p>
+  </div>  
+  <div>
+    <p><a href="http://osteele.com/sources/javascript/functional">Oliver Steele - Functional.js Library</a></p>
+  </div>
+
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="bower_components/jasmine/lib/jasmine-core/boot.js"></script>
+  <script type="text/javascript">
+
+  describe('Currying', function () {
+
+    // Using a hard-to-remember regular expression
+    var elements = "val1,  val2,        val3".split(/,\s*/);
+
+    it('Takes a string and convert it in an array', function () {
+      expect(elements.length).toBe(3);
+      expect(elements[0]).toBe('val1');
+      expect(elements[1]).toBe('val2');
+      expect(elements[2]).toBe('val3');
+    });
+
+    it('Saves the hard-to-remember reg exp into another function', function () {
+
+      Function.prototype.curry = function () {
+        var slice = Array.prototype.slice,
+          args = slice.call(arguments),
+          fn = this;
+
+        return function () {
+          return fn.apply(this, args.concat(slice.call(arguments)));
+        };
+      };
+
+      String.prototype.csv = String.prototype.split.curry(/,\s*/);
+
+      var elements = "val1,  val2,        val3".csv();
+
+      expect(elements.length).toBe(3);
+      expect(elements[0]).toBe('val1');
+      expect(elements[1]).toBe('val2');
+      expect(elements[2]).toBe('val3');
+
+    });
+
+  });
+
+  describe('Oliver Steele partial function: Merges the partial providing parameters in any place of the arguments list.', function () {
+
+    Function.prototype.partial = function () {
+      var fn = this,
+        args = Array.prototype.slice.call(arguments);
+
+      return function () {
+        var arg = 0;
+        for (var i = 0; i < args.length && arg < arguments.length; i += 1) {
+          if (args[i] === undefined) {
+            args[i] = arguments[arg++];
+          }
+        }
+        return fn.apply(this, args);
+      };
+    };
+
+    it('Delays 2 seconds', function () {
+      var delay2s = setTimeout.partial(undefined, 2000),
+        check = false;
+
+      delay2s(function () {
+        check = true;
+        console.log('Now!', check);
+      });
+
+      expect(check).toBe(false);
+
+      var bindClick = document.body.addEventListener.partial('click', undefined, false);
+
+      bindClick(function () {
+        console.log('A click listener in the body...');
+      });
+
+    });
+
+  });
+
+  </script>
+
+</body>
+</html>

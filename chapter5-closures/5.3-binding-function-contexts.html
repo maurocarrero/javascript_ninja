@@ -40,6 +40,12 @@
 
     elem.addEventListener('click', button.click, false);
 
+  /*
+  * BIND
+  * The binding funciton makes the assumption that we're
+  * going to be using an existing method of an object
+  * and that object as the context.
+  */
     function bind(context, name) {
       return function () {
         return context[name].apply(context, arguments);
@@ -47,6 +53,38 @@
     }
 
     elem2.addEventListener('click', bind(button, 'click'), false);
+
+    /*
+    * BIND function from Prototype Library
+    */
+
+    describe('Prototype Library BIND function', function () {
+
+      Function.prototype.bind = function () {
+        var fn = this, args = Array.prototype.slice.call(arguments),
+          obj = args.shift();
+
+        return function () {
+          return fn.apply(obj, args.concat(arguments));
+        };
+      };
+
+      var myObj = {};
+
+      function myFn() {
+        return this === myObj;
+      }
+
+      it('A simple function without a specified context', function () {
+        expect(myFn()).toBe(false);
+      });
+
+      it('Binds a function to an object with that object as the context', function () {
+        var myBoundFn = myFn.bind(myObj);
+        expect(myBoundFn()).toBe(true);
+      });
+
+    });
 
   </script>
 
